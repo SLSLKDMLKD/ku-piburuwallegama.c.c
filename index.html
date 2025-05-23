@@ -1,1654 +1,1289 @@
-import React, { useState, useEffect, useRef } from 'react'; // Import useRef for scrolling
-
-// Initial mock movie data for demonstration purposes
-const initialMockMovies = [
-  {
-    id: '1',
-    title: 'The Grand Adventure',
-    description: 'A thrilling journey across mystical lands to uncover ancient secrets.',
-    poster: 'https://placehold.co/400x600/FFB6C1/8B0000?text=Grand+Adventure', // Softer pink/red
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', // Example video URL (Big Buck Bunny)
-    adUrl: 'https://www.example.com/ad/adventure-promo', // Specific ad for this movie
-    views: 1250, // Initial view count
-    category: 'Action', // Added category
-  },
-  {
-    id: '2',
-    title: 'Mystery of the Lost City',
-    description: 'An archaeologist races against time to find a legendary lost city.',
-    poster: 'https://placehold.co/400x600/DDA0DD/4B0082?text=Lost+City', // Plum/Purple
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4', // Example video URL
-    adUrl: 'https://www.example.com/ad/lost-city-promo', // Specific ad for this movie
-    views: 890, // Initial view count
-    category: 'Mystery', // Added category
-  },
-  {
-    id: '3',
-    title: 'Space Odyssey 2025',
-    description: 'Humanity\'s last hope lies in a daring mission to the furthest reaches of the galaxy.',
-    poster: 'https://placehold.co/400x600/C6A4A4/A52A2A?text=Space+Odyssey', // Rosy brown
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/space-odyssey-promo', // Specific ad for this movie
-    views: 2100, // Initial view count
-    category: 'Sci-Fi', // Added category
-  },
-  {
-    id: '4',
-    title: 'The Silent Forest',
-    description: 'A chilling tale of survival in a forest where silence is the only sound.',
-    poster: 'https://placehold.co/400x600/F08080/800000?text=Silent+Forest', // Light coral
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/silent-forest-promo', // Specific ad for this movie
-    views: 560, // Initial view count
-    category: 'Horror', // Added category
-  },
-  {
-    id: '5',
-    title: 'Underwater World',
-    description: 'Explore the vibrant and mysterious depths of the ocean.',
-    poster: 'https://placehold.co/400x600/ADD8E6/000080?text=Underwater', // Light blue
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/underwater-promo', // Specific ad for this movie
-    views: 1500, // Initial view count
-    category: 'Documentary', // Added category
-  },
-  {
-    id: '6',
-    title: 'Future City',
-    description: 'A dystopian future where technology rules every aspect of life.',
-    poster: 'https://placehold.co/400x600/E6E6FA/4B0082?text=Future+City', // Lavender
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/future-city-promo', // Specific ad for this movie
-    views: 980, // Initial view count
-    category: 'Sci-Fi', // Added category
-  },
-  {
-    id: '7',
-    title: 'Trading Insights: Market Trends Explained',
-    description: 'An in-depth video analysis of current market trends, trading strategies, and financial news.',
-    poster: 'https://placehold.co/400x600/FFDAB9/A0522D?text=Trading+Video', // Peach puff
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', // Reusing a sample video URL for demonstration
-    adUrl: 'https://www.example.com/ad/trading-promo', // Specific ad for this movie
-    views: 3200, // Initial view count
-    category: 'Documentary', // Added category
-  },
-  {
-    id: '1000',
-    title: 'The Digital Frontier',
-    description: 'A documentary exploring the evolution of technology and its impact on society.',
-    poster: 'https://placehold.co/400x600/FFC0CB/C71585?text=Digital+Frontier', // Pink
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4', // Reusing a sample video URL
-    adUrl: 'https://www.example.com/ad/digital-frontier-promo', // Specific ad for this movie
-    views: 1800, // Initial view count
-    category: 'Documentary', // Added category
-  },
-  {
-    id: '8',
-    title: 'The Enigma Code',
-    description: 'A brilliant cryptographer races against time to decipher a code that could change the world.',
-    poster: 'https://placehold.co/400x600/EE82EE/800080?text=New+Movie+8', // Violet
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/enigma-code-promo', // Specific ad for this movie
-    views: 750, // Initial view count
-    category: 'Mystery', // Added category
-  },
-  { // New Movie 9
-    id: '9',
-    title: 'Whispers of the Past',
-    description: 'A captivating historical drama unraveling forgotten secrets and enduring legacies.',
-    poster: 'https://placehold.co/400x600/B0E0E6/4682B4?text=Whispers+Past', // Powder Blue
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/whispers-promo',
-    views: 300,
-    category: 'Drama',
-  },
-  {
-    id: '10',
-    title: 'The Cosmic Dance',
-    description: 'A stunning visual journey through the wonders of the universe, exploring galaxies and nebulae.',
-    poster: 'https://placehold.co/400x600/8A2BE2/FFFFFF?text=Cosmic+Dance', // Blue Violet
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/cosmic-dance-promo',
-    views: 900,
-    category: 'Sci-Fi',
-  },
-  {
-    id: '11',
-    title: 'Echoes of Tomorrow',
-    description: 'In a future where memories can be shared, a detective uncovers a conspiracy that threatens reality.',
-    poster: 'https://placehold.co/400x600/4B0082/FFFFFF?text=Echoes+Tomorrow', // Indigo
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/echoes-promo',
-    views: 650,
-    category: 'Sci-Fi',
-  },
-  {
-    id: '12',
-    title: 'Crimson Tide',
-    description: 'A gripping naval thriller where a submarine crew faces a moral dilemma during a nuclear standoff.',
-    poster: 'https://placehold.co/400x600/8B0000/FFFFFF?text=Crimson+Tide', // Dark Red
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/crimson-tide-promo',
-    views: 1100,
-    category: 'Action',
-  },
-  {
-    id: '13',
-    title: 'The Last Laugh',
-    description: 'A hilarious comedy about a group of friends trying to save their favorite local comedy club from closing.',
-    poster: 'https://placehold.co/400x600/FFD700/8B0000?text=Last+Laugh', // Gold
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/last-laugh-promo',
-    views: 720,
-    category: 'Comedy',
-  },
-  {
-    id: '14',
-    title: 'Ancient Whispers',
-    description: 'An adventurous archaeologist uncovers a lost civilization in the Amazon, facing ancient traps and curses.',
-    poster: 'https://placehold.co/400x600/DAA520/FFFFFF?text=Ancient+Whispers', // Goldenrod
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/ancient-whispers-promo',
-    views: 1300,
-    category: 'Adventure',
-  },
-  {
-    id: '15',
-    title: 'City of Shadows',
-    description: 'A gritty crime drama set in a corrupt metropolis, where a lone detective fights for justice.',
-    poster: 'https://placehold.co/400x600/696969/FFFFFF?text=City+Shadows', // Dim Gray
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/city-shadows-promo',
-    views: 950,
-    category: 'Drama',
-  },
-  {
-    id: '16',
-    title: 'The Great Escape',
-    description: 'Based on a true story, a group of prisoners plan an elaborate escape from an impenetrable fortress.',
-    poster: 'https://placehold.co/400x600/A9A9A9/FFFFFF?text=Great+Escape', // Dark Gray
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/great-escape-promo',
-    views: 1800,
-    category: 'Action',
-  },
-  {
-    id: '17',
-    title: 'Love in Bloom',
-    description: 'A heartwarming romantic comedy about two strangers who find love in unexpected places during springtime.',
-    poster: 'https://placehold.co/400x600/FF69B4/FFFFFF?text=Love+Bloom', // Hot Pink
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/love-bloom-promo',
-    views: 2500,
-    category: 'Romance',
-  },
-  {
-    id: '18',
-    title: 'Quantum Leap',
-    description: 'A mind-bending sci-fi thriller where a scientist discovers a way to jump through parallel universes.',
-    poster: 'https://placehold.co/400x600/800080/FFFFFF?text=Quantum+Leap', // Purple
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/quantum-leap-promo',
-    views: 1600,
-    category: 'Sci-Fi',
-  },
-  {
-    id: '19',
-    title: 'The Haunted Mansion',
-    description: 'A group of paranormal investigators spend a night in a notoriously haunted mansion, uncovering its dark past.',
-    poster: 'https://placehold.co/400x600/4F4F4F/FFFFFF?text=Haunted+Mansion', // Gray
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/haunted-mansion-promo',
-    views: 800,
-    category: 'Horror',
-  },
-  {
-    id: '20',
-    title: 'Beyond the Stars',
-    description: 'An epic space opera following a crew of explorers on a mission to discover new life forms in a distant galaxy.',
-    poster: 'https://placehold.co/400x600/191970/FFFFFF?text=Beyond+Stars', // Midnight Blue
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/beyond-stars-promo',
-    views: 2000,
-    category: 'Sci-Fi',
-  },
-  { // New Animation Movie 1
-    id: '21',
-    title: 'The Magical Forest',
-    description: 'A whimsical animated adventure about a young fairy protecting her enchanted forest from a mischievous wizard.',
-    poster: 'https://placehold.co/400x600/FFDAB9/A0522D?text=Magical+Forest', // Peach puff
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/magical-forest-promo',
-    views: 1500,
-    category: 'Animation',
-  },
-  { // New Animation Movie 2
-    id: '22',
-    title: 'Robo-Buddy Rescue',
-    description: 'A heartwarming animated story of a boy and his robot companion embarking on a daring rescue mission.',
-    poster: 'https://placehold.co/400x600/B0E0E6/4682B4?text=Robo-Buddy', // Powder Blue
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    adUrl: 'https://www.example.com/ad/robo-buddy-promo',
-    views: 1200,
-    category: 'Animation',
-  },
-  { // New Animation Movie 3
-    id: '23',
-    title: 'Dragon\'s Flight',
-    description: 'An epic animated tale of a brave knight befriending a dragon to save their kingdom from an ancient evil.',
-    poster: 'https://placehold.co/400x600/98FB98/006400?text=Dragon+Flight', // Pale Green
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    adUrl: 'https://www.example.com/ad/dragon-flight-promo',
-    views: 1800,
-    category: 'Animation',
-  },
-];
-
-// Mock Short Video Data
-const initialMockShortVideos = [
-  {
-    id: 'sv1',
-    title: 'Quick Tech Review',
-    description: 'A rapid-fire review of the latest gadget.',
-    poster: 'https://placehold.co/400x600/87CEEB/00008B?text=Tech+Review', // Sky Blue
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4', // Reusing for demo
-    adUrl: 'https://www.example.com/ad/tech-gadget',
-    views: 500,
-    likes: 120,
-    comments: 15,
-  },
-  {
-    id: 'sv2',
-    title: 'Cooking Hack: 5-Min Dessert',
-    description: 'Whip up a delicious dessert in under 5 minutes!',
-    poster: 'https://placehold.co/400x600/FFD700/B8860B?text=Cooking+Hack', // Gold
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', // Reusing for demo
-    adUrl: 'https://www.example.com/ad/dessert-kit',
-    views: 800,
-    likes: 250,
-    comments: 30,
-  },
-  {
-    id: 'sv3',
-    title: 'Travel Vlog: Hidden Gem',
-    description: 'Discover a breathtaking hidden spot for your next adventure.',
-    poster: 'https://placehold.co/400x600/98FB98/228B22?text=Travel+Vlog', // Pale Green
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4', // Reusing for demo
-    adUrl: 'https://www.example.com/ad/travel-booking',
-    views: 1100,
-    likes: 400,
-    comments: 55,
-  },
-  {
-    id: 'sv4',
-    title: 'Fitness Tip: Daily Stretch',
-    description: 'Simple stretches to improve flexibility and reduce stiffness.',
-    poster: 'https://placehold.co/400x600/FF6347/8B0000?text=Fitness+Tip', // Tomato
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', // Reusing for demo
-    adUrl: 'https://www.example.com/ad/gym-membership',
-    views: 650,
-    likes: 180,
-    comments: 20,
-  },
-  {
-    id: 'sv5',
-    title: 'Art Tutorial: Watercolor Basics',
-    description: 'Learn the fundamentals of watercolor painting in a short session.',
-    poster: 'https://placehold.co/400x600/DDA0DD/800080?text=Art+Tutorial', // Plum
-    videoUrl: 'https://www.w3schools.com/html/movie.mp4', // Reusing for demo
-    adUrl: 'https://www.example.com/ad/art-supplies',
-    views: 400,
-    likes: 90,
-    comments: 10,
-  },
-];
-
-
-// Mock Categories for the dropdown
-const mockCategories = [
-  'All', // Added 'All' category
-  'Action',
-  'Comedy',
-  'Drama',
-  'Fantasy',
-  'Horror',
-  'Mystery',
-  'Romance',
-  'Sci-Fi',
-  'Thriller',
-  'Documentary',
-  'Adventure', // Added 'Adventure' category
-  'Animation', // Added 'Animation' category
-];
-
-// Restriction Modal Component
-const RestrictionModal = ({ message, onClose }) => {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
-      <div className="bg-pink-900 bg-opacity-90 rounded-xl shadow-2xl p-8 max-w-lg text-center border-2 border-red-500 relative">
-        <h3 className="text-3xl font-bold text-red-400 mb-4">Access Restricted</h3>
-        <p className="text-pink-200 text-lg mb-6">
-          {message}
-        </p>
-        <p className="text-pink-300 text-sm mb-6">
-          Please disable your ad blocker or VPN and refresh the page to continue.
-        </p>
-        <button
-          onClick={onClose}
-          className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  );
-};
-
-
-// Main App component
-function App() {
-  // State to manage all movies, allowing for view count updates
-  const [movies, setMovies] = useState(initialMockMovies);
-  // State for short videos
-  const [shortVideos, setShortVideos] = useState(initialMockShortVideos);
-  // State to manage the currently selected movie for playback
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  // State to manage the current view: 'home', 'player', or 'short_videos'
-  const [currentView, setCurrentView] = useState('home');
-
-  // State for Gemini API: Fun Facts
-  const [funFacts, setFunFacts] = useState(null);
-  const [isLoadingFacts, setIsLoadingFacts] = useState(false);
-
-  // State for Gemini API: Movie Recommendations (user query based)
-  const [recommendationQuery, setRecommendationQuery] = useState('');
-  const [recommendedMovies, setRecommendedMovies] = useState([]);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
-
-  // State for Gemini API: Trending Movies (general suggestions)
-  const [trendingMovies, setTrendingMovies] = useState([]);
-  const [isLoadingTrending, setIsLoadingTrending] = useState(false);
-
-  // State for VPN and Ad Blocker detection
-  const [isVpnDetected, setIsVpnDetected] = useState(true); // Simulate VPN detection (set to false to disable VPN warning)
-  const [isAdBlockerDetected, setIsAdBlockerDetected] = useState(false);
-  const [showRestrictionModal, setShowRestrictionModal] = useState(false);
-
-  // State for Categories dropdown visibility
-  const [showCategoriesDropdown, setShowCategoriesDropdown] = useState(false);
-  // New state for selected category
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  // New state for search query
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // State for comments
-  const [comments, setComments] = useState([]);
-  const [newCommentText, setNewCommentText] = useState('');
-
-  // State for file uploads
-  const [uploadedVideo, setUploadedVideo] = useState(null);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState('');
-
-  // Ref for the new uploads scroll container
-  const newUploadsRef = useRef(null);
-
-  // State for Hero Carousel
-  const [heroCarouselIndex, setHeroCarouselIndex] = useState(0);
-  const heroCarouselRef = useRef(null);
-
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const moviesPerPage = 10; // Display 10 movies per page
-
-  // State for current short video index for TikTok-like view
-  const [currentShortVideoIndex, setCurrentShortVideoIndex] = useState(0);
-  const shortVideoPlayerRef = useRef(null); // Ref for scrolling short videos
-
-  // Theme state: 'dark' or 'light'
-  const [theme, setTheme] = useState('dark');
-
-  // Effect for automatic scrolling of new uploads
-  useEffect(() => {
-    let scrollInterval;
-    if (currentView === 'home') {
-      scrollInterval = setInterval(() => {
-        if (newUploadsRef.current) {
-          const { scrollLeft, scrollWidth, clientWidth } = newUploadsRef.current;
-          const scrollAmount = 200; // Amount to scroll each interval
-
-          // If scrolled to the end, reset to beginning
-          if (scrollLeft + clientWidth >= scrollWidth) {
-            newUploadsRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            newUploadsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-          }
-        }
-      }, 3000); // Scroll every 3 seconds
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToxyFan - Movie Streaming Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
     }
 
-    // Cleanup function to clear the interval when component unmounts or view changes
-    return () => {
-      if (scrollInterval) {
-        clearInterval(scrollInterval);
-      }
-    };
-  }, [currentView]); // Re-run effect when currentView changes
-
-  // Effect for automatic hero carousel slide change
-  useEffect(() => {
-    const heroInterval = setInterval(() => {
-      setHeroCarouselIndex((prevIndex) => (prevIndex + 1) % movies.length);
-    }, 5000); // Change slide every 5 seconds
-
-    return () => clearInterval(heroInterval);
-  }, [movies.length]); // Re-run if movies array changes
-
-  // Effect to scroll hero carousel into view when index changes
-  useEffect(() => {
-    if (heroCarouselRef.current) {
-      const scrollContainer = heroCarouselRef.current;
-      const itemWidth = scrollContainer.children[0]?.offsetWidth || 0; // Assuming all items have same width
-      scrollContainer.scrollTo({
-        left: heroCarouselIndex * itemWidth,
-        behavior: 'smooth',
-      });
-    }
-  }, [heroCarouselIndex]);
-
-  // Effect to scroll short video player into view when index changes
-  useEffect(() => {
-    if (currentView === 'short_videos' && shortVideoPlayerRef.current) {
-      const scrollContainer = shortVideoPlayerRef.current;
-      const itemHeight = scrollContainer.children[0]?.offsetHeight || 0;
-      scrollContainer.scrollTo({
-        top: currentShortVideoIndex * itemHeight,
-        behavior: 'smooth',
-      });
-    }
-  }, [currentShortVideoIndex, currentView]);
-
-
-  // useEffect for Ad Blocker and VPN detection
-  useEffect(() => {
-    const detectAdBlocker = () => {
-      // Create a dummy ad element
-      const adTest = document.createElement('div');
-      adTest.innerHTML = '&nbsp;';
-      adTest.className = 'ad-test adsbox'; // Common ad blocker class names
-      adTest.style.position = 'absolute';
-      adTest.style.top = '-9999px';
-      adTest.style.left = '-9999px';
-      document.body.appendChild(adTest);
-
-      // Give a small delay for ad blockers to act
-      setTimeout(() => {
-        if (adTest.offsetHeight === 0 || adTest.style.display === 'none' || adTest.style.visibility === 'hidden') {
-          setIsAdBlockerDetected(true);
-        }
-        document.body.removeChild(adTest); // Clean up the dummy element
-      }, 100);
-    };
-
-    detectAdBlocker();
-
-    // Set showRestrictionModal based on detection status
-    if (isVpnDetected || isAdBlockerDetected) {
-      setShowRestrictionModal(true);
-    } else {
-      setShowRestrictionModal(false);
+    body {
+      min-height: 100vh;
+      transition: background-color 0.5s ease, color 0.5s ease;
     }
 
-  }, [isVpnDetected, isAdBlockerDetected]); // Run detection if these states change
-
-
-  // Function to handle playing a movie/short video and opening an ad link
-  const handlePlayContent = (content) => {
-    // Only proceed if no restriction is active
-    if (showRestrictionModal) {
-      return;
+    body.dark {
+      background: linear-gradient(135deg, #4a1d4a 0%, #2d0a2d 50%, #4a0a0a 100%);
+      color: #fbcfe8;
     }
 
-    // Increment view count for the selected content (movie or short video)
-    if (content.id.startsWith('sv')) { // Check if it's a short video
-      setShortVideos(prevShortVideos =>
-        prevShortVideos.map(sv =>
-          sv.id === content.id ? { ...sv, views: sv.views + 1 } : sv
-        )
-      );
-    } else { // Assume it's a regular movie
-      setMovies(prevMovies =>
-        prevMovies.map(m =>
-          m.id === content.id ? { ...m, views: m.views + 1 } : m
-        )
-      );
+    body.light {
+      background: linear-gradient(135deg, #e0f2fe 0%, #e9d5ff 50%, #fce7f3 100%);
+      color: #1e293b;
     }
 
-    setSelectedMovie(content); // Renamed selectedMovie to selectedContent for clarity
-    setCurrentView('player');
-    setFunFacts(null); // Clear fun facts when new content is selected
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
 
-    // Open a new tab with an advertisement link specific to the content
-    window.open(content.adUrl, '_blank');
-  };
+    /* Header Styles */
+    header {
+      padding: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: background-color 0.5s ease;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-  // Function to go back to the home screen
-  const handleBackToHome = () => {
-    setSelectedMovie(null);
-    setCurrentView('home');
-    setFunFacts(null); // Clear fun facts
-    setRecommendedMovies([]); // Clear recommendations
-    setRecommendationQuery(''); // Clear recommendation query
-    setTrendingMovies([]); // Clear trending movies
-    setShowCategoriesDropdown(false); // Close dropdown when navigating home
-    setNewCommentText(''); // Clear comment input
-    setUploadedVideo(null); // Clear uploaded video
-    setUploadedImage(null); // Clear uploaded image
-    setUploadStatus(''); // Clear upload status
-    setSelectedCategory('All'); // Reset category filter
-    setSearchQuery(''); // Reset search query
-    setCurrentPage(1); // Reset to first page
-    setCurrentShortVideoIndex(0); // Reset short video index
-  };
+    header.dark {
+      background-color: rgba(131, 24, 67, 0.7);
+      backdrop-filter: blur(10px);
+    }
 
-  /**
-   * Handles scrolling the new uploads section left or right.
-   * @param {string} direction 'left' or 'right'
-   */
-  const scrollNewUploads = (direction) => {
-    if (newUploadsRef.current) {
-      const scrollAmount = 300; // Adjust scroll amount as needed
-      if (direction === 'left') {
-        newUploadsRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        newUploadsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    header.light {
+      background-color: rgba(147, 197, 253, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    @media (min-width: 640px) {
+      nav {
+        flex-direction: row;
       }
     }
-  };
 
-  /**
-   * Navigates to the next short video.
-   */
-  const goToNextShortVideo = () => {
-    setCurrentShortVideoIndex((prevIndex) =>
-      (prevIndex + 1) % shortVideos.length
-    );
-  };
+    .logo {
+      height: 40px;
+      border-radius: 0.375rem;
+      margin-bottom: 1rem;
+    }
 
-  /**
-   * Navigates to the previous short video.
-   */
-  const goToPreviousShortVideo = () => {
-    setCurrentShortVideoIndex((prevIndex) =>
-      (prevIndex - 1 + shortVideos.length) % shortVideos.length
-    );
-  };
-
-  /**
-   * Calls the Gemini API to generate fun facts about the selected movie.
-   */
-  const generateFunFacts = async () => {
-    if (!selectedMovie) return;
-    setIsLoadingFacts(true);
-    setFunFacts(null); // Clear previous facts
-
-    // Construct the prompt for the LLM
-    const prompt = `Generate 3-5 interesting fun facts about the movie titled "${selectedMovie.title}" with the description: "${selectedMovie.description}". Focus on general movie trivia, production details, or interesting themes. Format as a bulleted list.`;
-
-    let chatHistory = [];
-    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-    const payload = { contents: chatHistory };
-    const apiKey = ""; // API key is provided by the environment
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json();
-
-      // Check if the response structure is as expected and extract the text
-      if (result.candidates && result.candidates.length > 0 &&
-          result.candidates[0].content && result.candidates[0].content.parts &&
-          result.candidates[0].content.parts.length > 0) {
-        const text = result.candidates[0].content.parts[0].text;
-        setFunFacts(text);
-      } else {
-        console.error("Gemini API response structure unexpected for fun facts:", result);
-        setFunFacts("Could not generate fun facts. Please try again.");
+    @media (min-width: 640px) {
+      .logo {
+        margin-bottom: 0;
       }
-    } catch (error) {
-      console.error("Error calling Gemini API for fun facts:", error);
-      setFunFacts("Error generating fun facts. Please check your connection.");
-    } finally {
-      setIsLoadingFacts(false);
     }
-  };
 
-  /**
-   * Calls the Gemini API to get movie recommendations based on user query.
-   */
-  const getMovieRecommendations = async () => {
-    if (!recommendationQuery.trim()) {
-      setRecommendedMovies([{ title: "Please enter a query.", description: "" }]);
-      return;
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
     }
-    setIsLoadingRecommendations(true);
-    setRecommendedMovies([]); // Clear previous recommendations
 
-    // Construct the prompt for the LLM to get structured JSON response
-    const prompt = `Given the query: "${recommendationQuery}", recommend 3-5 movie titles and a very brief, one-sentence description for each. Provide the response as a JSON array of objects, where each object has "title" and "description" properties.`;
-
-    let chatHistory = [];
-    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-    const payload = {
-      contents: chatHistory,
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "ARRAY",
-          items: {
-            type: "OBJECT",
-            properties: {
-              "title": { "type": "STRING" },
-              "description": { "type": "STRING" }
-            },
-            "propertyOrdering": ["title", "description"]
-          }
-        }
+    @media (min-width: 640px) {
+      .nav-buttons {
+        justify-content: flex-end;
+        gap: 1rem;
       }
-    };
-    const apiKey = ""; // API key is provided by the environment
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    }
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json();
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+    }
 
-      // Check if the response structure is as expected and parse the JSON
-      if (result.candidates && result.candidates.length > 0 &&
-          result.candidates[0].content && result.candidates[0].content.parts &&
-          result.candidates[0].content.parts.length > 0) {
-        const jsonString = result.candidates[0].content.parts[0].text;
-        const parsedJson = JSON.parse(jsonString);
-        setRecommendedMovies(parsedJson);
-      } else {
-        console.error("Gemini API response structure unexpected for recommendations:", result);
-        setRecommendedMovies([{ title: "No recommendations found.", description: "Please try a different query." }]);
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-dark {
+      background-color: #be185d;
+      color: #fbcfe8;
+    }
+
+    .btn-dark:hover {
+      background-color: #9d174d;
+    }
+
+    .btn-light {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-light:hover {
+      background-color: #2563eb;
+    }
+
+    .btn-purple {
+      background-color: #7e22ce;
+      color: white;
+    }
+
+    .btn-purple:hover {
+      background-color: #6b21a8;
+    }
+
+    .btn-red {
+      background-color: #dc2626;
+      color: white;
+    }
+
+    .btn-red:hover {
+      background-color: #b91c1c;
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 0.5rem;
+      width: 160px;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    @media (min-width: 640px) {
+      .dropdown-menu {
+        width: 192px;
       }
-    } catch (error) {
-      console.error("Error calling Gemini API for recommendations:", error);
-      setRecommendedMovies([{ title: "Error getting recommendations.", description: "Please check your connection." }]);
-    } finally {
-      setIsLoadingRecommendations(false);
     }
-  };
 
-  /**
-   * Calls the Gemini API to get trending movie suggestions.
-   */
-  const getTrendingMovies = async () => {
-    setIsLoadingTrending(true);
-    setTrendingMovies([]); // Clear previous trending movies
+    .dropdown-menu.dark {
+      background-color: rgba(131, 24, 67, 0.95);
+    }
 
-    const prompt = `Suggest 3-5 trending movie titles and a very brief description for each, focusing on popular genres like romance, action, or fantasy. Provide the response as a JSON array of objects, where each object has "title" and "description" properties.`;
+    .dropdown-menu.light {
+      background-color: rgba(191, 219, 254, 0.95);
+    }
 
-    let chatHistory = [];
-    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-    const payload = {
-      contents: chatHistory,
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "ARRAY",
-          items: {
-            type: "OBJECT",
-            properties: {
-              "title": { "type": "STRING" },
-              "description": { "type": "STRING" }
-            },
-            "propertyOrdering": ["title", "description"]
-          }
-        }
+    .dropdown-item {
+      display: block;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+      font-size: 0.875rem;
+    }
+
+    .dropdown-item.dark {
+      color: #fbcfe8;
+    }
+
+    .dropdown-item.dark:hover {
+      background-color: rgba(190, 24, 93, 0.7);
+    }
+
+    .dropdown-item.light {
+      color: #1e293b;
+    }
+
+    .dropdown-item.light:hover {
+      background-color: rgba(59, 130, 246, 0.3);
+    }
+
+    /* Main Content Styles */
+    main {
+      padding: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      main {
+        padding: 1.5rem;
       }
-    };
-    const apiKey = ""; // API key is provided by the environment
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    }
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json();
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
 
-      if (result.candidates && result.candidates.length > 0 &&
-          result.candidates[0].content && result.candidates[0].content.parts &&
-          result.candidates[0].content.parts.length > 0) {
-        const jsonString = result.candidates[0].content.parts[0].text;
-        const parsedJson = JSON.parse(jsonString);
-        setTrendingMovies(parsedJson);
-      } else {
-        console.error("Gemini API response structure unexpected for trending movies:", result);
-        setTrendingMovies([{ title: "No trending movies found.", description: "Please try again." }]);
+    @media (min-width: 640px) {
+      .section-title {
+        font-size: 1.875rem;
+        margin-bottom: 1.5rem;
       }
-    } catch (error) {
-      console.error("Error calling Gemini API for trending movies:", error);
-      setTrendingMovies([{ title: "Error getting trending movies.", description: "Please check your connection." }]);
-    } finally {
-      setIsLoadingTrending(false);
     }
-  };
 
-  // Function to add a new comment
-  const handleAddComment = (e) => {
-    e.preventDefault(); // Prevent default form submission
-    if (newCommentText.trim() && selectedMovie) {
-      const newComment = {
-        id: Date.now().toString(), // Simple unique ID
-        movieId: selectedMovie.id,
-        text: newCommentText.trim(),
-        timestamp: new Date().toLocaleString(),
-        likes: 0,
-      };
-      setComments(prevComments => [...prevComments, newComment]);
-      setNewCommentText(''); // Clear the input field
+    .section-title.dark {
+      color: #fbcfe8;
     }
-  };
 
-  // Function to like a comment
-  const handleLikeComment = (commentId) => {
-    setComments(prevComments =>
-      prevComments.map(comment =>
-        comment.id === commentId ? { ...comment, likes: comment.likes + 1 } : comment
-      )
-    );
-  };
-
-  const filteredComments = selectedMovie
-    ? comments.filter(comment => comment.movieId === selectedMovie.id)
-    : [];
-
-  // Function to simulate Telegram upload
-  const simulateTelegramUpload = async (fileType, file) => {
-    setUploadStatus(`Uploading ${fileType} "${file.name}"...`);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log(`Simulating upload of ${fileType}:`, file.name);
-        // In a real application, you would send this 'file' to your backend
-        // which would then securely interact with the Telegram Bot API.
-        // Example conceptual (non-runnable) API call structure for Telegram:
-        /*
-        const telegramBotToken = 'YOUR_TELEGRAM_BOT_TOKEN'; // NEVER expose in frontend
-        const telegramChannelId = 'YOUR_TELEGRAM_CHANNEL_ID'; // NEVER expose in frontend
-        const formData = new FormData();
-        formData.append('chat_id', telegramChannelId);
-        if (fileType === 'video') {
-          formData.append('video', file);
-        } else { // image
-          formData.append('photo', file);
-        }
-
-        fetch(`https://api.telegram.org/bot${telegramBotToken}/send${fileType === 'video' ? 'Video' : 'Photo'}`, {
-          method: 'POST',
-          body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.ok) {
-            setUploadStatus(`${fileType} uploaded successfully!`);
-            resolve(true);
-          } else {
-            setUploadStatus(`Failed to upload ${fileType}: ${data.description}`);
-            resolve(false);
-          }
-        })
-        .catch(error => {
-          setUploadStatus(`Error uploading ${fileType}: ${error.message}`);
-          resolve(false);
-        });
-        */
-        setUploadStatus(`${file.name} (${fileType}) simulated upload successful!`);
-        resolve(true);
-      }, 2000); // Simulate network delay
-    });
-  };
-
-  // Handle video file selection
-  const handleVideoFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('video/')) {
-      setUploadedVideo(file);
-      setUploadStatus(`Video selected: ${file.name}`);
-    } else {
-      setUploadedVideo(null);
-      setUploadStatus('Please select a valid video file.');
+    .section-title.light {
+      color: #1e40af;
     }
-  };
 
-  // Handle image file selection
-  const handleImageFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setUploadedImage(file);
-      setUploadStatus(`Image selected: ${file.name}`);
-    } else {
-      setUploadedImage(null);
-      setUploadStatus('Please select a valid image file.');
+    /* Hero Carousel */
+    .hero-carousel {
+      position: relative;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
     }
-  };
 
-  // Handle video upload button click
-  const handleVideoUpload = () => {
-    if (uploadedVideo) {
-      simulateTelegramUpload('video', uploadedVideo);
-    } else {
-      setUploadStatus('No video file selected to upload.');
+    @media (min-width: 640px) {
+      .hero-carousel {
+        padding: 2rem;
+        margin-bottom: 3rem;
+      }
     }
-  };
 
-  // Handle image upload button click
-  const handleImageUpload = () => {
-    if (uploadedImage) {
-      simulateTelegramUpload('image', uploadedImage);
-    } else {
-      setUploadStatus('No image file selected to upload.');
+    .hero-carousel.dark {
+      background-color: rgba(131, 24, 67, 0.4);
     }
-  };
 
-  // Filter movies based on selected category AND search query
-  const filteredAndSearchedMovies = movies.filter(movie => {
-    const matchesCategory = selectedCategory === 'All' || movie.category === selectedCategory;
-    const matchesSearch = movie.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+    .hero-carousel.light {
+      background-color: rgba(191, 219, 254, 0.4);
+    }
 
-  // Get current movies for pagination
-  const indexOfLastMovie = currentPage * moviesPerPage;
-  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
-  const currentMovies = filteredAndSearchedMovies.slice(indexOfFirstMovie, indexOfLastMovie);
+    .carousel-controls {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem;
+      z-index: 10;
+    }
 
-  // Calculate total pages
-  const totalPages = Math.ceil(filteredAndSearchedMovies.length / moviesPerPage);
+    @media (min-width: 640px) {
+      .carousel-controls {
+        padding: 1rem;
+      }
+    }
 
-  // Handle page change
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    .carousel-btn {
+      border-radius: 9999px;
+      padding: 0.25rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  // Toggle theme
-  const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
-  };
+    .carousel-btn:active {
+      transform: scale(0.95);
+    }
 
+    .carousel-btn.dark {
+      background-color: rgba(190, 24, 93, 0.7);
+    }
 
-  return (
-    <div className={`min-h-screen font-inter transition-colors duration-500 ${
-      theme === 'dark'
-        ? 'bg-gradient-to-br from-pink-950 via-purple-950 to-red-950 text-pink-100'
-        : 'bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 text-gray-800'
-    }`}>
-      {showRestrictionModal && (
-        <RestrictionModal
-          message={isVpnDetected && isAdBlockerDetected ?
-            "Both VPN and Ad Blocker detected. Access is restricted." :
-            isVpnDetected ? "VPN detected. Access is restricted." :
-            "Ad Blocker detected. Access is restricted."
-          }
-          onClose={() => setShowRestrictionModal(false)} // Pass the function to close the modal
-        />
-      )}
+    .carousel-btn.dark:hover {
+      background-color: #9d174d;
+    }
 
-      {/* Header */}
-      <header className={`p-4 shadow-lg transition-colors duration-500 ${
-        theme === 'dark'
-          ? 'bg-pink-900 bg-opacity-70 backdrop-blur-sm'
-          : 'bg-blue-300 bg-opacity-70 backdrop-blur-sm'
-      }`}>
-        <nav className="container mx-auto flex flex-col sm:flex-row justify-between items-center"> {/* Added flex-col and sm:flex-row for responsiveness */}
-          {/* Replaced h1 with img tag for the logo */}
-          <img
-            src="uploaded:image_88a3f1.jpg-348b5cb1-9d6d-4b54-a5f1-6123da590fb8" // Using the provided contentFetchId for the logo
-            alt="ToxyFan Logo"
-            className="h-10 rounded-md mb-4 sm:mb-0" // Added margin-bottom for mobile
-            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x40/FFC0CB/C71585?text=ToxyFan'; }} // Fallback placeholder
-          />
-          <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 sm:gap-4"> {/* Changed space-x- to gap- for better wrapping */}
-            <button
-              onClick={handleBackToHome}
-              className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base transition-colors duration-300 shadow-md ${ /* Adjusted padding and font size for mobile */
-                theme === 'dark'
-                  ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-            >
-              Home
-            </button>
-            <button
-              onClick={() => setCurrentView('short_videos')}
-              className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base transition-colors duration-300 shadow-md ${
-                theme === 'dark'
-                  ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-            >
-              Short Videos
-            </button>
-            <div className="relative">
-              <button
-                onClick={() => setShowCategoriesDropdown(!showCategoriesDropdown)}
-                className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base transition-colors duration-300 shadow-md flex items-center ${ /* Adjusted padding and font size for mobile */
-                  theme === 'dark'
-                    ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white'
-                }`}
-              >
-                Categories
-                {/* Dropdown arrow icon */}
-                <svg
-                  className={`ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 ${
-                    showCategoriesDropdown ? 'rotate-180' : ''
-                  } ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
-              {showCategoriesDropdown && (
-                <div className={`absolute right-0 mt-2 w-40 sm:w-48 rounded-lg shadow-xl z-10 ${ /* Adjusted width for mobile */
-                  theme === 'dark'
-                    ? 'bg-pink-800 bg-opacity-95'
-                    : 'bg-blue-200 bg-opacity-95'
-                }`}>
-                  <ul className="py-1">
-                    {mockCategories.map((category) => (
-                      <li key={category}>
-                        <a
-                          href="#"
-                          className={`block px-3 py-1 sm:px-4 sm:py-2 text-sm transition-colors duration-200 ${ /* Adjusted padding and font size for mobile */
-                            theme === 'dark'
-                              ? 'text-pink-100 hover:bg-pink-700'
-                              : 'text-gray-800 hover:bg-blue-300'
-                          }`}
-                          onClick={() => {
-                            setSelectedCategory(category); // Set selected category
-                            setShowCategoriesDropdown(false); // Close dropdown after selection
-                            setCurrentPage(1); // Reset to first page when category changes
-                          }}
-                        >
-                          {category}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            <button className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base transition-colors duration-300 shadow-md ${ /* Adjusted padding and font size for mobile */
-              theme === 'dark'
-                ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}>
-              My List
-            </button>
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-full transition-colors duration-300 shadow-md ${
-                theme === 'dark'
-                  ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 3.325l-.707.707M6.382 6.382l-.707-.707M16.95 6.95l.707-.707M7.05 16.95l-.707.707M12 7a5 5 0 100 10 5 5 0 000-10z"></path>
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.293 13.293A8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                </svg>
-              )}
-            </button>
-          </div>
-        </nav>
-      </header>
+    .carousel-btn.light {
+      background-color: rgba(59, 130, 246, 0.7);
+    }
 
-      {/* Main Content Area */}
-      <main className="container mx-auto p-4 sm:p-6"> {/* Adjusted padding for mobile */}
-        {showRestrictionModal && (
-          <RestrictionModal
-            message={isVpnDetected && isAdBlockerDetected ?
-              "Both VPN and Ad Blocker detected. Access is restricted." :
-              isVpnDetected ? "VPN detected. Access is restricted." :
-              "Ad Blocker detected. Access is restricted."
-            }
-            onClose={() => setShowRestrictionModal(false)}
-          />
-        )}
+    .carousel-btn.light:hover {
+      background-color: #2563eb;
+    }
 
-        {currentView === 'home' && (
-          <section className="home-view">
-            {/* Hero Section - Now a Dynamic Carousel */}
-            <div className={`relative rounded-xl p-4 sm:p-8 mb-8 sm:mb-12 shadow-xl overflow-hidden ${
-              theme === 'dark'
-                ? 'bg-pink-800 bg-opacity-40'
-                : 'bg-blue-200 bg-opacity-40'
-            }`}>
-              <div className="absolute inset-0 flex items-center justify-between z-10 p-2 sm:p-4"> {/* Adjusted padding for mobile */}
-                <button
-                  onClick={() => setHeroCarouselIndex((prevIndex) => (prevIndex - 1 + movies.length) % movies.length)}
-                  className={`rounded-full p-1 sm:p-2 shadow-lg transition-colors duration-300 ${ /* Adjusted padding for mobile */
-                    theme === 'dark'
-                      ? 'bg-pink-700 bg-opacity-70 hover:bg-pink-600'
-                      : 'bg-blue-500 bg-opacity-70 hover:bg-blue-600'
-                  }`}
-                  aria-label="Previous slide"
-                >
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
-                <button
-                  onClick={() => setHeroCarouselIndex((prevIndex) => (prevIndex + 1) % movies.length)}
-                  className={`rounded-full p-1 sm:p-2 shadow-lg transition-colors duration-300 ${ /* Adjusted padding for mobile */
-                    theme === 'dark'
-                      ? 'bg-pink-700 bg-opacity-70 hover:bg-pink-600'
-                      : 'bg-blue-500 bg-opacity-70 hover:bg-blue-600'
-                  }`}
-                  aria-label="Next slide"
-                >
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
-              </div>
+    .carousel {
+      display: flex;
+      overflow-x: hidden;
+      scroll-snap-type: x mandatory;
+      border-radius: 0.75rem;
+    }
 
-              <div ref={heroCarouselRef} className="flex overflow-x-hidden snap-x snap-mandatory rounded-xl">
-                {movies.map((movie, index) => (
-                  <div
-                    key={movie.id}
-                    className="flex-none w-full snap-center relative transition-transform duration-500 ease-in-out" // Added transition
-                    style={{ transform: `translateX(-${heroCarouselIndex * 100}%)` }} // Controlled by state
-                  >
-                    <div className="flex flex-col md:flex-row items-center justify-center p-4 sm:p-8"> {/* Adjusted padding and margin for mobile */}
-                      <div className="md:w-1/2 z-10 text-center md:text-left">
-                        <h2 className={`text-3xl sm:text-5xl font-extrabold mb-2 sm:mb-4 leading-tight drop-shadow-lg ${ /* Adjusted font size and margin for mobile */
-                          theme === 'dark' ? 'text-pink-200' : 'text-blue-800'
-                        }`}>
-                          New Video: {movie.title}
-                        </h2>
-                        <p className={`text-base sm:text-xl mb-4 sm:mb-6 max-w-md mx-auto md:mx-0 ${ /* Adjusted font size and margin for mobile */
-                          theme === 'dark' ? 'text-pink-300' : 'text-gray-700'
-                        }`}>
-                          {movie.description}
-                        </p>
-                        <button
-                          onClick={() => handlePlayContent(movie)}
-                          className="px-6 py-2 sm:px-8 sm:py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-base sm:text-lg rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-75" /* Added active:scale-95 for click animation */
-                        >
-                          Watch Now
-                        </button>
-                      </div>
-                      <div className="md:w-1/2 mt-6 md:mt-0 flex justify-center md:justify-end z-0"> {/* Adjusted margin-top for mobile */}
-                        <img
-                          src={movie.poster}
-                          alt={movie.title}
-                          className="w-48 h-72 sm:w-auto sm:h-auto rounded-lg shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500 cursor-pointer" /* Adjusted image size for mobile */
-                          onClick={() => handlePlayContent(movie)}
-                          onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/300x450/FF69B4/FFFFFF?text=Poster+Unavailable`; }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+    .carousel-slide {
+      flex: none;
+      width: 100%;
+      scroll-snap-align: start;
+      position: relative;
+      transition: transform 0.5s ease-in-out;
+    }
 
-            {/* Trending Movies Section */}
-            <div className="mb-8 sm:mb-12"> {/* Adjusted margin-bottom for mobile */}
-              <h3 className={`text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 ${ /* Adjusted font size and margin for mobile */
-                theme === 'dark' ? 'text-pink-200' : 'text-blue-800'
-              }`}>Trending Now</h3>
-              <button
-                onClick={getTrendingMovies}
-                className={`mb-4 px-4 py-2 text-sm sm:text-base rounded-lg transition-colors duration-300 shadow-md active:scale-95 ${ /* Added active:scale-95 for click animation */
-                  theme === 'dark'
-                    ? 'bg-purple-700 hover:bg-purple-600 text-pink-100'
-                    : 'bg-purple-500 hover:bg-purple-600 text-white'
-                }`}
-              >
-                Get Trending Movies
-              </button>
-              {isLoadingTrending && <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-sm sm:text-base`}>Loading trending movies...</p>} {/* Adjusted font size for mobile */}
-              {trendingMovies.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"> {/* Adjusted gap for mobile */}
-                  {trendingMovies.map((movie, index) => (
-                    <div key={index} className={`rounded-xl shadow-lg p-3 sm:p-4 transition-transform duration-300 hover:scale-105 hover:shadow-2xl ${ /* Adjusted padding for mobile */
-                      theme === 'dark'
-                        ? 'bg-pink-800 bg-opacity-50'
-                        : 'bg-blue-200 bg-opacity-50'
-                    }`}>
-                      <h4 className={`text-lg sm:text-xl font-semibold mb-1 sm:mb-2 ${ /* Adjusted font size and margin for mobile */
-                        theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-                      }`}>{movie.title}</h4>
-                      <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-xs sm:text-sm`}>{movie.description}</p> {/* Adjusted font size for mobile */}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+    .carousel-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
 
-            {/* New Uploads Section */}
-            <div className="mb-8 sm:mb-12 relative"> {/* Adjusted margin-bottom for mobile */}
-              <h3 className={`text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 ${ /* Adjusted font size and margin for mobile */
-                theme === 'dark' ? 'text-pink-200' : 'text-blue-800'
-              }`}>New Uploads</h3>
-              <button
-                onClick={() => scrollNewUploads('left')}
-                className={`absolute left-0 top-1/2 transform -translate-y-1/2 rounded-full p-1 sm:p-2 shadow-lg z-10 transition-colors duration-300 active:scale-95 ${ /* Added active:scale-95 for click animation */
-                  theme === 'dark'
-                    ? 'bg-pink-700 bg-opacity-70 hover:bg-pink-600'
-                    : 'bg-blue-500 bg-opacity-70 hover:bg-blue-600'
-                }`}
-                aria-label="Scroll left"
-              >
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-              </button>
-              <div ref={newUploadsRef} className="flex overflow-x-auto space-x-4 sm:space-x-6 p-2 sm:p-4 scrollbar-hide"> {/* Adjusted spacing and padding for mobile */}
-                {movies.map((movie) => (
-                  <div
-                    key={movie.id}
-                    className={`flex-none w-48 sm:w-64 rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl ${ /* Adjusted width for mobile */
-                      theme === 'dark'
-                        ? 'bg-pink-800 bg-opacity-50'
-                        : 'bg-blue-200 bg-opacity-50'
-                    }`}
-                    onClick={() => handlePlayContent(movie)}
-                  >
-                    <img
-                      src={movie.poster}
-                      alt={movie.title}
-                      className="w-full h-64 sm:h-80 object-cover rounded-t-xl" /* Adjusted height for mobile */
-                      onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x600/FFB6C1/8B0000?text=Poster+Unavailable`; }}
-                    />
-                    <div className="p-3 sm:p-4"> {/* Adjusted padding for mobile */}
-                      <h4 className={`text-lg sm:text-xl font-semibold mb-1 sm:mb-2 ${ /* Adjusted font size and margin for mobile */
-                        theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-                      }`}>{movie.title}</h4>
-                      <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-xs sm:text-sm truncate`}>{movie.description}</p> {/* Adjusted font size for mobile */}
-                      <p className={`${theme === 'dark' ? 'text-pink-400' : 'text-gray-600'} text-xs mt-2`}>Views: {movie.views}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => scrollNewUploads('right')}
-                className={`absolute right-0 top-1/2 transform -translate-y-1/2 rounded-full p-1 sm:p-2 shadow-lg z-10 transition-colors duration-300 active:scale-95 ${ /* Added active:scale-95 for click animation */
-                  theme === 'dark'
-                    ? 'bg-pink-700 bg-opacity-70 hover:bg-pink-600'
-                    : 'bg-blue-500 bg-opacity-70 hover:bg-blue-600'
-                }`}
-                aria-label="Scroll right"
-              >
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-              </button>
-            </div>
+    @media (min-width: 768px) {
+      .carousel-content {
+        flex-direction: row;
+        padding: 2rem;
+      }
+    }
 
-            {/* Movie Recommendations Section */}
-            <div className="mb-8 sm:mb-12"> {/* Adjusted margin-bottom for mobile */}
-              <h3 className={`text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 ${ /* Adjusted font size and margin for mobile */
-                theme === 'dark' ? 'text-pink-200' : 'text-blue-800'
-              }`}>Personalized Recommendations</h3>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4"> {/* Adjusted gap for mobile */}
-                <input
-                  type="text"
-                  value={recommendationQuery}
-                  onChange={(e) => setRecommendationQuery(e.target.value)}
-                  placeholder="e.g., 'sci-fi with strong female lead' or 'comedy for family'"
-                  className={`flex-grow p-2 sm:p-3 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 border ${
-                    theme === 'dark'
-                      ? 'bg-pink-900 bg-opacity-70 text-pink-50 placeholder-pink-300 focus:ring-pink-500 border-pink-700'
-                      : 'bg-blue-100 bg-opacity-70 text-gray-800 placeholder-gray-500 focus:ring-blue-500 border-blue-300'
-                  }`}
-                />
-                <button
-                  onClick={getMovieRecommendations}
-                  className="px-4 py-2 sm:px-6 sm:py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-sm sm:text-base rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75" /* Added active:scale-95 for click animation */
-                >
-                  Get Recommendations
-                </button>
-              </div>
-              {isLoadingRecommendations && <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-sm sm:text-base`}>Generating recommendations...</p>} {/* Adjusted font size for mobile */}
-              {recommendedMovies.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"> {/* Adjusted gap for mobile */}
-                  {recommendedMovies.map((movie, index) => (
-                    <div key={index} className={`rounded-xl shadow-lg p-3 sm:p-4 transition-transform duration-300 hover:scale-105 hover:shadow-2xl ${
-                      theme === 'dark'
-                        ? 'bg-pink-800 bg-opacity-50'
-                        : 'bg-blue-200 bg-opacity-50'
-                    }`}>
-                      <h4 className={`text-lg sm:text-xl font-semibold mb-1 sm:mb-2 ${ /* Adjusted font size and margin for mobile */
-                        theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-                      }`}>{movie.title}</h4>
-                      <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-xs sm:text-sm`}>{movie.description}</p> {/* Adjusted font size for mobile */}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+    .carousel-text {
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+    }
 
-            {/* All Movies Section */}
-            <h3 className={`text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 ${ /* Adjusted font size and margin for mobile */
-              theme === 'dark' ? 'text-pink-200' : 'text-blue-800'
-            }`}>All Movies ({selectedCategory === 'All' ? 'All' : selectedCategory})</h3>
-            <div className="mb-4">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search movies by title..."
-                className={`w-full p-2 sm:p-3 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 border ${
-                  theme === 'dark'
-                    ? 'bg-pink-900 bg-opacity-70 text-pink-50 placeholder-pink-300 focus:ring-pink-500 border-pink-700'
-                    : 'bg-blue-100 bg-opacity-70 text-gray-800 placeholder-gray-500 focus:ring-blue-500 border-blue-300'
-                }`}
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"> {/* Adjusted grid columns and gap for mobile */}
-              {currentMovies.map((movie) => (
-                <div
-                  key={movie.id}
-                  className={`rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl ${
-                    theme === 'dark'
-                      ? 'bg-pink-800 bg-opacity-50'
-                      : 'bg-blue-200 bg-opacity-50'
-                  }`}
-                  onClick={() => handlePlayContent(movie)}
-                >
-                  <img
-                    src={movie.poster}
-                    alt={movie.title}
-                    className="w-full h-64 sm:h-80 object-cover rounded-t-xl" /* Adjusted height for mobile */
-                    onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x600/FFB6C1/8B0000?text=Poster+Unavailable`; }}
-                  />
-                  <div className="p-3 sm:p-4"> {/* Adjusted padding for mobile */}
-                    <h4 className={`text-lg sm:text-xl font-semibold mb-1 sm:mb-2 ${ /* Adjusted font size and margin for mobile */
-                      theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-                    }`}>{movie.title}</h4>
-                    <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-xs sm:text-sm truncate`}>{movie.description}</p> {/* Adjusted font size for mobile */}
-                    <p className={`${theme === 'dark' ? 'text-pink-400' : 'text-gray-600'} text-xs mt-2`}>Views: {movie.views}</p>
-                  </div>
-                </div>
-              ))}
-              {currentMovies.length === 0 && (
-                <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} col-span-full text-center text-sm sm:text-base`}>No movies found matching your criteria.</p>
-              )}
-            </div>
+    @media (min-width: 768px) {
+      .carousel-text {
+        width: 50%;
+        text-align: left;
+      }
+    }
 
-            {/* Pagination Controls */}
-            {filteredAndSearchedMovies.length > moviesPerPage && (
-              <div className="flex flex-col sm:flex-row justify-center items-center mt-6 sm:mt-8 space-y-2 sm:space-y-0 sm:space-x-4"> {/* Adjusted layout and spacing for mobile, removed space-x-0 */}
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`px-3 py-1 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg transition-colors duration-300 shadow-md disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 ${ /* Added active:scale-95 for click animation */
-                    theme === 'dark'
-                      ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  }`}
-                >
-                  Previous Page
-                </button>
-                <span className={`${theme === 'dark' ? 'text-pink-200' : 'text-gray-800'} text-sm sm:text-lg`}> {/* Adjusted font size for mobile */}
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={`px-3 py-1 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg transition-colors duration-300 shadow-md disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 ${ /* Added active:scale-95 for click animation */
-                    theme === 'dark'
-                      ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  }`}
-                >
-                  Next Page
-                </button>
-              </div>
-            )}
+    .carousel-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      line-height: 1.25;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
 
-            {/* Upload Section */}
-            <div className={`mt-12 sm:mt-16 rounded-xl shadow-xl p-4 sm:p-8 ${ /* Adjusted margin-top and padding for mobile */
-              theme === 'dark'
-                ? 'bg-pink-900 bg-opacity-70 backdrop-blur-sm'
-                : 'bg-blue-300 bg-opacity-70 backdrop-blur-sm'
-            }`}>
-              <h2 className={`text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center ${ /* Adjusted font size and margin for mobile */
-                theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-              }`}>
-                Upload Your Content
-              </h2>
+    @media (min-width: 640px) {
+      .carousel-title {
+        font-size: 2.25rem;
+        margin-bottom: 1rem;
+      }
+    }
 
-              {/* Video Upload */}
-              <div className={`mb-6 sm:mb-8 p-4 sm:p-6 rounded-lg shadow-inner ${ /* Adjusted margin-bottom and padding for mobile */
-                theme === 'dark'
-                  ? 'bg-pink-800 bg-opacity-50'
-                  : 'bg-blue-200 bg-opacity-50'
-              }`}>
-                <h3 className={`text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ${ /* Adjusted font size and margin for mobile */
-                  theme === 'dark' ? 'text-pink-200' : 'text-gray-800'
-                }`}>Upload Video</h3>
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleVideoFileChange}
-                  className={`block w-full text-sm sm:text-base file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:text-white hover:file:bg-pink-700 cursor-pointer ${ /* Adjusted font size and padding for mobile */
-                    theme === 'dark'
-                      ? 'text-pink-100 file:bg-pink-600'
-                      : 'text-gray-800 file:bg-blue-600'
-                  }`}
-                />
-                {uploadedVideo && (
-                  <div className="mt-4">
-                    <video controls src={URL.createObjectURL(uploadedVideo)} className="w-full max-h-48 sm:max-h-64 object-contain rounded-lg shadow-md"></video> {/* Adjusted max-height for mobile */}
-                    <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-xs sm:text-sm mt-2`}>Selected: {uploadedVideo.name}</p> {/* Adjusted font size for mobile */}
-                  </div>
-                )}
-                <button
-                  onClick={handleVideoUpload}
-                  disabled={!uploadedVideo}
-                  className="mt-4 px-4 py-2 text-sm sm:text-base bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed" /* Added active:scale-95 for click animation */
-                >
-                  Upload Video to Telegram (Simulated)
-                </button>
-              </div>
+    .carousel-title.dark {
+      color: #fbcfe8;
+    }
 
-              {/* Image Upload */}
-              <div className={`p-4 sm:p-6 rounded-lg shadow-inner ${ /* Adjusted padding for mobile */
-                theme === 'dark'
-                  ? 'bg-pink-800 bg-opacity-50'
-                  : 'bg-blue-200 bg-opacity-50'
-              }`}>
-                <h3 className={`text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ${ /* Adjusted font size and margin for mobile */
-                  theme === 'dark' ? 'text-pink-200' : 'text-gray-800'
-                }`}>Upload Image</h3>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageFileChange}
-                  className={`block w-full text-sm sm:text-base file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:text-white hover:file:bg-pink-700 cursor-pointer ${ /* Adjusted font size and padding for mobile */
-                    theme === 'dark'
-                      ? 'text-pink-100 file:bg-pink-600'
-                      : 'text-gray-800 file:bg-blue-600'
-                  }`}
-                />
-                {uploadedImage && (
-                  <div className="mt-4">
-                    <img src={URL.createObjectURL(uploadedImage)} alt="Uploaded Preview" className="w-full max-h-48 sm:max-h-64 object-contain rounded-lg shadow-md" /> {/* Adjusted max-height for mobile */}
-                    <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-xs sm:text-sm mt-2`}>Selected: {uploadedImage.name}</p> {/* Adjusted font size for mobile */}
-                  </div>
-                )}
-                <button
-                  onClick={handleImageUpload}
-                  disabled={!uploadedImage}
-                  className="mt-4 px-4 py-2 text-sm sm:text-base bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed" /* Added active:scale-95 for click animation */
-                >
-                  Upload Image to Telegram (Simulated)
-                </button>
-              </div>
+    .carousel-title.light {
+      color: #1e40af;
+    }
 
-              {uploadStatus && (
-                <p className={`mt-6 text-center text-base sm:text-lg font-semibold ${ /* Adjusted font size for mobile */
-                  theme === 'dark' ? 'text-pink-300' : 'text-gray-700'
-                }`}>
-                  {uploadStatus}
-                </p>
-              )}
-              <p className={`mt-4 text-center text-xs sm:text-sm italic ${ /* Adjusted font size for mobile */
-                theme === 'dark' ? 'text-pink-400' : 'text-gray-600'
-              }`}>
-                Note: Actual Telegram API integration requires a backend server to handle file uploads and securely store bot tokens and channel IDs. This demonstration simulates the frontend interaction.
-              </p>
-            </div>
-          </section>
-        )}
+    .carousel-description {
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      max-width: 28rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-        {currentView === 'short_videos' && (
-          <section className="short-videos-view flex flex-col items-center justify-center min-h-[calc(100vh-160px)] p-4"> {/* Centered content, adjusted min-height */}
-            <button
-              onClick={handleBackToHome}
-              className={`mb-4 sm:mb-6 px-4 py-2 text-sm sm:text-base rounded-lg transition-colors duration-300 shadow-md flex items-center active:scale-95 ${ /* Added active:scale-95 for click animation */
-                theme === 'dark'
-                  ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-              Back to Home
-            </button>
-            <h2 className={`text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 ${
-              theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-            }`}>Short Videos</h2>
+    @media (min-width: 640px) {
+      .carousel-description {
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+      }
+    }
 
-            {shortVideos.length > 0 ? (
-              <div className="relative w-full max-w-md h-[70vh] sm:h-[80vh] mx-auto rounded-xl shadow-2xl overflow-hidden">
-                {/* Video Container with vertical scrolling */}
-                <div ref={shortVideoPlayerRef} className="w-full h-full overflow-y-scroll snap-y snap-mandatory">
-                  {shortVideos.map((video, index) => (
-                    <div key={video.id} className="w-full h-full flex-none snap-center relative transition-transform duration-300 ease-in-out"> {/* Added transition */}
-                      <video
-                        controls
-                        autoPlay={index === currentShortVideoIndex} // Autoplay only current video
-                        loop
-                        muted // Mute by default to avoid autoplay issues
-                        src={video.videoUrl}
-                        poster={video.poster}
-                        className="w-full h-full object-cover"
-                        onEnded={goToNextShortVideo} // Auto-advance to next video
-                      >
-                        Your browser does not support the video tag.
-                      </video>
+    @media (min-width: 768px) {
+      .carousel-description {
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
 
-                      {/* Overlay for video details and actions */}
-                      <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black via-black/70 to-transparent text-white">
-                        <h3 className="text-xl sm:text-2xl font-bold mb-1">{video.title}</h3>
-                        <p className="text-sm sm:text-base mb-2">{video.description}</p>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 12.586l4.293-4.293a1 1 0 011.414 1.414L10 15.414l-5.707-5.707a1 1 0 011.414-1.414L10 12.586z"></path></svg>
-                            {video.views} Views
-                          </span>
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"></path></svg>
-                            {video.likes} Likes
-                          </span>
-                          <span className="flex items-center">
-                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.275-1.077L3 15l1.249-1.249A7.931 7.931 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path></svg>
-                            {video.comments} Comments
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+    .carousel-description.dark {
+      color: #f9a8d4;
+    }
 
-                {/* Navigation Buttons for short videos */}
-                <div className="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 flex justify-between p-2 z-20">
-                  <button
-                    onClick={goToPreviousShortVideo}
-                    className={`p-2 rounded-full shadow-lg transition-colors duration-300 active:scale-95 ${ /* Added active:scale-95 for click animation */
-                      theme === 'dark'
-                        ? 'bg-pink-700 bg-opacity-70 hover:bg-pink-600'
-                        : 'bg-blue-500 bg-opacity-70 hover:bg-blue-600'
-                    }`}
-                    aria-label="Previous short video"
-                  >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-                  </button>
-                  <button
-                    onClick={goToNextShortVideo}
-                    className={`p-2 rounded-full shadow-lg transition-colors duration-300 active:scale-95 ${ /* Added active:scale-95 for click animation */
-                      theme === 'dark'
-                        ? 'bg-pink-700 bg-opacity-70 hover:bg-pink-600'
-                        : 'bg-blue-500 bg-opacity-70 hover:bg-blue-600'
-                    }`}
-                    aria-label="Next short video"
-                  >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-700'} text-center text-sm sm:text-base mt-8`}>No short videos available.</p>
-            )}
-          </section>
-        )}
+    .carousel-description.light {
+      color: #374151;
+    }
 
-        {currentView === 'player' && selectedMovie && (
-          <section className="player-view">
-            <button
-              onClick={handleBackToHome}
-              className={`mb-4 sm:mb-6 px-4 py-2 text-sm sm:text-base rounded-lg transition-colors duration-300 shadow-md flex items-center active:scale-95 ${ /* Added active:scale-95 for click animation */
-                theme === 'dark'
-                  ? 'bg-pink-700 hover:bg-pink-600 text-pink-100'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-              Back to Home
-            </button>
+    .watch-btn {
+      padding: 0.5rem 1.5rem;
+      background-color: #dc2626;
+      color: white;
+      font-weight: bold;
+      font-size: 0.875rem;
+      border-radius: 9999px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      transform-origin: center;
+    }
 
-            <div className={`rounded-xl shadow-2xl p-4 sm:p-6 mb-6 sm:mb-8 ${ /* Adjusted padding and margin-bottom for mobile */
-              theme === 'dark'
-                ? 'bg-pink-900 bg-opacity-70'
-                : 'bg-blue-300 bg-opacity-70'
-            }`}>
-              <h2 className={`text-2xl sm:text-4xl font-bold mb-2 sm:mb-4 ${ /* Adjusted font size and margin for mobile */
-                theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-              }`}>{selectedMovie.title}</h2>
-              <div className="relative w-full h-0 pb-[56.25%] mb-4 sm:mb-6 rounded-lg overflow-hidden shadow-xl"> {/* 16:9 Aspect Ratio Container */}
-                <video
-                  key={selectedMovie.videoUrl} // Key helps re-render video when source changes
-                  controls
-                  autoPlay
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                  src={selectedMovie.videoUrl}
-                  onEnded={() => console.log('Content ended!')} // Example event handler
-                >
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              <p className={`text-sm sm:text-lg mb-3 sm:mb-4 ${ /* Adjusted font size and margin for mobile */
-                theme === 'dark' ? 'text-pink-200' : 'text-gray-700'
-              }`}>{selectedMovie.description}</p>
-              <p className={`${theme === 'dark' ? 'text-pink-300' : 'text-gray-600'} text-xs sm:text-sm`}>Total Views: {selectedMovie.views}</p> {/* Adjusted font size for mobile */}
+    @media (min-width: 640px) {
+      .watch-btn {
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+      }
+    }
 
-              {/* Fun Facts Section */}
-              <div className="mt-6 sm:mt-8"> {/* Adjusted margin-top for mobile */}
-                <h3 className={`text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ${ /* Adjusted font size and margin for mobile */
-                  theme === 'dark' ? 'text-pink-200' : 'text-gray-800'
-                }`}>Fun Facts</h3>
-                <button
-                  onClick={generateFunFacts}
-                  className={`px-4 py-2 text-sm sm:text-base rounded-lg transition-colors duration-300 shadow-md mb-3 sm:mb-4 active:scale-95 ${ /* Added active:scale-95 for click animation */
-                    theme === 'dark'
-                      ? 'bg-purple-700 hover:bg-purple-600 text-pink-100'
-                      : 'bg-purple-500 hover:bg-purple-600 text-white'
-                  }`}
-                  disabled={isLoadingFacts}
-                >
-                  {isLoadingFacts ? 'Generating...' : 'Generate Fun Facts'}
-                </button>
-                {funFacts && (
-                  <div className={`rounded-lg p-3 sm:p-4 ${ /* Adjusted padding for mobile */
-                    theme === 'dark' ? 'bg-pink-800 bg-opacity-50 text-pink-200' : 'bg-blue-200 bg-opacity-50 text-gray-800'
-                  }`}>
-                    <p className="whitespace-pre-wrap text-sm sm:text-base">{funFacts}</p> {/* Adjusted font size for mobile */}
-                  </div>
-                )}
-                {!funFacts && !isLoadingFacts && (
-                  <p className={`${theme === 'dark' ? 'text-pink-400' : 'text-gray-600'} text-sm sm:text-base`}>Click the button to get some fun facts about this movie!</p>
-                )}
-              </div>
+    .watch-btn:hover {
+      background-color: #b91c1c;
+      transform: scale(1.05);
+    }
 
-              {/* Comment Section */}
-              <div className="mt-6 sm:mt-8"> {/* Adjusted margin-top for mobile */}
-                <h3 className={`text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ${ /* Adjusted font size and margin for mobile */
-                  theme === 'dark' ? 'text-pink-200' : 'text-gray-800'
-                }`}>Comments</h3>
-                <form onSubmit={handleAddComment} className="mb-4 sm:mb-6"> {/* Adjusted margin-bottom for mobile */}
-                  <textarea
-                    className={`w-full p-2 sm:p-3 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 border resize-y min-h-[60px] sm:min-h-[80px] ${ /* Adjusted padding, font size and min-height for mobile */
-                      theme === 'dark'
-                        ? 'bg-pink-900 bg-opacity-70 text-pink-50 placeholder-pink-300 focus:ring-pink-500 border-pink-700'
-                        : 'bg-blue-100 bg-opacity-70 text-gray-800 placeholder-gray-500 focus:ring-blue-500 border-blue-300'
-                    }`}
-                    placeholder="Add a comment..."
-                    value={newCommentText}
-                    onChange={(e) => setNewCommentText(e.target.value)}
-                  ></textarea>
-                  <button
-                    type="submit"
-                    className="mt-2 sm:mt-3 px-4 py-2 text-sm sm:text-base bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed" /* Added active:scale-95 for click animation */
-                  >
-                    Post Comment
-                  </button>
-                </form>
+    .watch-btn:active {
+      transform: scale(0.95);
+    }
 
-                {filteredComments.length === 0 ? (
-                  <p className={`${theme === 'dark' ? 'text-pink-400' : 'text-gray-600'} text-sm sm:text-base`}>No comments yet. Be the first to comment!</p>
-                ) : (
-                  <div className="space-y-3 sm:space-y-4"> {/* Adjusted spacing for mobile */}
-                    {filteredComments.map((comment) => (
-                      <div key={comment.id} className={`rounded-lg p-3 sm:p-4 shadow-md ${ /* Adjusted padding for mobile */
-                        theme === 'dark'
-                          ? 'bg-pink-800 bg-opacity-50'
-                          : 'bg-blue-200 bg-opacity-50'
-                      }`}>
-                        <p className={`text-sm sm:text-lg mb-1 sm:mb-2 ${ /* Adjusted font size and margin for mobile */
-                          theme === 'dark' ? 'text-pink-100' : 'text-gray-800'
-                        }`}>{comment.text}</p>
-                        <div className={`flex items-center justify-between text-xs sm:text-sm ${ /* Adjusted font size for mobile */
-                          theme === 'dark' ? 'text-pink-400' : 'text-gray-600'
-                        }`}>
-                          <span>Posted: {comment.timestamp}</span>
-                          <button
-                            onClick={() => handleLikeComment(comment.id)}
-                            className={`flex items-center space-x-1 hover:text-pink-100 transition-colors duration-200 active:scale-95 ${ /* Added active:scale-95 for click animation */
-                              theme === 'dark' ? 'text-pink-300' : 'text-gray-700 hover:text-gray-900'
-                            }`}
-                          >
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"></path></svg>
-                            <span>{comment.likes} Likes</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
-      </main>
+    .watch-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.5);
+    }
 
-      {/* Footer */}
-      <footer className={`p-4 text-center text-xs sm:text-sm shadow-inner mt-8 sm:mt-12 ${ /* Adjusted padding, font size and margin-top for mobile */
-        theme === 'dark'
-          ? 'bg-pink-900 bg-opacity-70 backdrop-blur-sm text-pink-300'
-          : 'bg-blue-300 bg-opacity-70 backdrop-blur-sm text-gray-700'
-      }`}>
-        <p>&copy; {new Date().getFullYear()} ToxyFan. All rights reserved.</p>
-        <p>Designed with <span className="text-red-400">&hearts;</span> for movie lovers.</p>
-      </footer>
-    </div>
-  );
-}
+    .carousel-image {
+      width: 100%;
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
 
-export default App;
+    @media (min-width: 768px) {
+      .carousel-image {
+        width: 50%;
+        margin-top: 0;
+        justify-content: flex-end;
+      }
+    }
+
+    .carousel-poster {
+      width: 12rem;
+      height: 18rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transition: transform 0.5s ease;
+      cursor: pointer;
+      transform: rotate(3deg);
+    }
+
+    @media (min-width: 640px) {
+      .carousel-poster {
+        width: auto;
+        height: auto;
+      }
+    }
+
+    .carousel-poster:hover {
+      transform: rotate(0deg);
+    }
+
+    /* New Uploads Section */
+    .new-uploads {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    @media (min-width: 640px) {
+      .new-uploads {
+        margin-bottom: 3rem;
+      }
+    }
+
+    .scroll-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border-radius: 9999px;
+      padding: 0.25rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .scroll-btn:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .scroll-btn.dark {
+      background-color: rgba(190, 24, 93, 0.7);
+    }
+
+    .scroll-btn.dark:hover {
+      background-color: #9d174d;
+    }
+
+    .scroll-btn.light {
+      background-color: rgba(59, 130, 246, 0.7);
+    }
+
+    .scroll-btn.light:hover {
+      background-color: #2563eb;
+    }
+
+    .scroll-btn-left {
+      left: 0;
+    }
+
+    .scroll-btn-right {
+      right: 0;
+    }
+
+    .scroll-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 1rem;
+      padding: 0.5rem;
+      scrollbar-width: none;
+    }
+
+    .scroll-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .movie-card {
+      flex: none;
+      width: 12rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    @media (min-width: 640px) {
+      .movie-card {
+        width: 16rem;
+      }
+    }
+
+    .movie-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .movie-card.dark {
+      background-color: rgba(190, 24, 93, 0.5);
+    }
+
+    .movie-card.light {
+      background-color: rgba(191, 219, 254, 0.5);
+    }
+
+    .movie-poster {
+      width: 100%;
+      height: 16rem;
+      object-fit: cover;
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
+    }
+
+    @media (min-width: 640px) {
+      .movie-poster {
+        height: 20rem;
+      }
+    }
+
+    .movie-info {
+      padding: 0.75rem;
+    }
+
+    .movie-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .movie-title {
+        font-size: 1.125rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .movie-title.dark {
+      color: #fbcfe8;
+    }
+
+    .movie-title.light {
+      color: #1e293b;
+    }
+
+    .movie-description {
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (min-width: 640px) {
+      .movie-description {
+        font-size: 0.875rem;
+      }
+    }
+
+    .movie-description.dark {
+      color: #f9a8d4;
+    }
+
+    .movie-description.light {
+      color: #4b5563;
+    }
+
+    .movie-views {
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .movie-views.dark {
+      color: #f472b6;
+    }
+
+    .movie-views.light {
+      color: #6b7280;
+    }
+
+    /* Movie Grid */
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .movie-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 768px) {
+      .movie-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .movie-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* Recommendation Cards */
+    .recommendation-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .recommendation-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .recommendation-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .recommendation-card {
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .recommendation-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .recommendation-card.dark {
+      background-color: rgba(190, 24, 93, 0.5);
+    }
+
+    .recommendation-card.light {
+      background-color: rgba(191, 219, 254, 0.5);
+    }
+
+    .recommendation-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .recommendation-title.dark {
+      color: #fbcfe8;
+    }
+
+    .recommendation-title.light {
+      color: #1e293b;
+    }
+
+    .recommendation-description {
+      font-size: 0.875rem;
+    }
+
+    .recommendation-description.dark {
+      color: #f9a8d4;
+    }
+
+    .recommendation-description.light {
+      color: #4b5563;
+    }
+
+    /* Search Input */
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      border: 1px solid;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    @media (min-width: 640px) {
+      .search-input {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+      }
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 0 2px;
+    }
+
+    .search-input.dark {
+      background-color: rgba(131, 24, 67, 0.7);
+      color: #fbcfe8;
+      border-color: #9d174d;
+      box-shadow: none;
+    }
+
+    .search-input.dark::placeholder {
+      color: #f9a8d4;
+    }
+
+    .search-input.dark:focus {
+      box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.5);
+      border-color: #f472b6;
+    }
+
+    .search-input.light {
+      background-color: rgba(191, 219, 254, 0.7);
+      color: #1e293b;
+      border-color: #93c5fd;
+      box-shadow: none;
+    }
+
+    .search-input.light::placeholder {
+      color: #64748b;
+    }
+
+    .search-input.light:focus {
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+      border-color: #3b82f6;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1.5rem;
+      gap: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .pagination {
+        flex-direction: row;
+        gap: 1rem;
+      }
+    }
+
+    .page-info {
+      font-size: 0.875rem;
+    }
+
+    @media (min-width: 640px) {
+      .page-info {
+        font-size: 1.125rem;
+      }
+    }
+
+    .page-info.dark {
+      color: #fbcfe8;
+    }
+
+    .page-info.light {
+      color: #1e293b;
+    }
+
+    /* Upload Section */
+    .upload-section {
+      border-radius: 0.75rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      padding: 1rem;
+      margin-top: 3rem;
+    }
+
+    @media (min-width: 640px) {
+      .upload-section {
+        padding: 2rem;
+        margin-top: 4rem;
+      }
+    }
+
+    .upload-section.dark {
+      background-color: rgba(131, 24, 67, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .upload-section.light {
+      background-color: rgba(147, 197, 253, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .upload-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      .upload-title {
+        font-size: 1.875rem;
+        margin-bottom: 1.5rem;
+      }
+    }
+
+    .upload-title.dark {
+      color: #fbcfe8;
+    }
+
+    .upload-title.light {
+      color: #1e293b;
+    }
+
+    .upload-box {
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    @media (min-width: 640px) {
+      .upload-box {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+    }
+
+    .upload-box.dark {
+      background-color: rgba(190, 24, 93, 0.5);
+    }
+
+    .upload-box.light {
+      background-color: rgba(191, 219, 254, 0.5);
+    }
+
+    .upload-box-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 0.75rem;
+    }
+
+    @media (min-width: 640px) {
+      .upload-box-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .upload-box-title.dark {
+      color: #fbcfe8;
+    }
+
+    .upload-box-title.light {
+      color: #1e293b;
+    }
+
+    .file-input {
+      display: block;
+      width: 100%;
+      font-size: 0.875rem;
+    }
+
+    @media (min-width: 640px) {
+      .file-input {
+        font-size: 1rem;
+      }
+    }
+
+    .file-input.dark {
+      color: #fbcfe8;
+    }
+
+    .file-input.dark::file-selector-button {
+      margin-right: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      border: none;
+      background-color: #be185d;
+      color: white;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .file-input.dark::file-selector-button:hover {
+      background-color: #9d174d;
+    }
+
+    .file-input.light {
+      color: #1e293b;
+    }
+
+    .file-input.light::file-selector-button {
+      margin-right: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      border: none;
+      background-color: #3b82f6;
+      color: white;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .file-input.light::file-selector-button:hover {
+      background-color: #2563eb;
+    }
+
+    .preview-container {
+      margin-top: 1rem;
+    }
+
+    .preview-media {
+      width: 100%;
+      max-height: 12rem;
+      object-fit: contain;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    @media (min-width: 640px) {
+      .preview-media {
+        max-height: 16rem;
+      }
+    }
+
+    .file-info {
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .file-info {
+        font-size: 0.875rem;
+      }
+    }
+
+    .file-info.dark {
+      color: #f9a8d4;
+    }
+
+    .file-info.light {
+      color: #6b7280;
+    }
+
+    .upload-btn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #dc2626;
+      color: white;
+      font-weight: bold;
+      font-size: 0.875rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      transform-origin: center;
+    }
+
+    @media (min-width: 640px) {
+      .upload-btn {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+      }
+    }
+
+    .upload-btn:hover {
+      background-color: #b91c1c;
+      transform: scale(1.05);
+    }
+
+    .upload-btn:active {
+      transform: scale(0.95);
+    }
+
+    .upload-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.5);
+    }
+
+    .upload-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .upload-status {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    @media (min-width: 640px) {
+      .upload-status {
+        font-size: 1.125rem;
+      }
+    }
+
+    .upload-status.dark {
+      color: #f9a8d4;
+    }
+
+    .upload-status.light {
+      color: #4b5563;
+    }
+
+    .upload-note {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.75rem;
+      font-style: italic;
+    }
+
+    @media (min-width: 640px) {
+      .upload-note {
+        font-size: 0.875rem;
+      }
+    }
+
+    .upload-note.dark {
+      color: #f472b6;
+    }
+
+    .upload-note.light {
+      color: #6b7280;
+    }
+
+    /* Short Videos View */
+    .short-videos-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 160px);
+      padding: 1rem;
+    }
+
+    .short-videos-container {
+      position: relative;
+      width: 100%;
+      max-width: 28rem;
+      height: 70vh;
+      margin: 0 auto;
+      border-radius: 0.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    @media (min-width: 640px) {
+      .short-videos-container {
+        height: 80vh;
+      }
+    }
+
+    .short-videos-scroll {
+      width: 100%;
+      height: 100%;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+    }
+
+    .short-video-item {
+      width: 100%;
+      height: 100%;
+      flex: none;
+      scroll-snap-align: start;
+      position: relative;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .short-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .short-video-info {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1rem;
+      background: linear-gradient(to top, #000000, rgba(0, 0, 0, 0.7), transparent);
+      color: white;
+    }
+
+    .short-video-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .short-video-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .short-video-description {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .short-video-description {
+        font-size: 1rem;
+      }
+    }
+
+    .short-video-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+    }
+
+    @media (min-width: 640px) {
+      .short-video-stats {
+        font-size: 0.875rem;
+      }
+    }
+
+    .short-video-stat {
+      display: flex;
+      align-items: center;
+    }
+
+    .short-video-stat svg {
+      margin-right: 0.25rem;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .short-video-nav {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem;
+      z-index: 20;
+    }
+
+    .short-video-nav-btn {
+      padding: 0.5rem;
+      border-radius: 9999px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .short-video-nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .short-video-nav-btn.dark {
+      background-color: rgba(190, 24, 93, 0.7);
+    }
+
+    .short-video-nav-btn.dark:hover {
+      background-color: #9d174d;
+    }
+
+    .short-video-nav-btn.light {
+      background-color: rgba(59, 130, 246, 0.7);
+    }
+
+    .short-video-nav-btn.light:hover {
+      background-color: #2563eb;
+    }
+
+    /* Player View */
+    .player-view {
+      padding: 1rem;
+    }
+
+    .player-container {
+      border-radius: 0.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .player-container {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+    }
+
+    .player-container.dark {
+      background-color: rgba(131, 24, 67, 0.7);
+    }
+
+    .player-container.light {
+      background-color: rgba(191, 219, 254, 0.7);
+    }
+
+    .player-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .player-title {
+        font-size: 2.25rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .player-title.dark {
+      color: #fbcfe8;
+    }
+
+    .player-title.light {
+      color: #1e293b;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%;
+      margin-bottom: 1rem;
+      border-radius: 0
